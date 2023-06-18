@@ -11,6 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 
 public class MainServlet extends HttpServlet {
     private PostController controller;
+    private final static String GET = "GET";
+    private final static String POST = "POST";
+    private final static String DELETE = "DELETE";
+    private final static String REQUEST_WITH_ADDENDUM = "/api/posts/\\d+";
+    private final static String REQUEST = "/api/posts/";
 
     @Override
     public void init() {
@@ -25,27 +30,27 @@ public class MainServlet extends HttpServlet {
             final var path = req.getRequestURI();
             final var method = req.getMethod();
             long id = 0;
-            if (path.matches("/api/posts/\\d+")) {
+            if (path.matches(REQUEST_WITH_ADDENDUM)) {
                 id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
             }
-            if (method.equals("GET") && path.equals("/api/posts")) {
+            if (method.equals(GET) && path.equals(REQUEST)) {
                 controller.all(resp);
                 return;
             }
-            if (method.equals("GET") && path.matches("/api/posts/\\d+")) {
+            if (method.equals(GET) && path.matches(REQUEST_WITH_ADDENDUM)) {
                 controller.getById(id, resp);
                 return;
             }
-            if (method.equals("POST") && path.equals("/api/posts")) {
+            if (method.equals(POST) && path.equals(REQUEST)) {
                 controller.save(req.getReader(), resp);
                 return;
             }
-            if (method.equals("DELETE") && path.matches("/api/posts/\\d+")) {
+            if (method.equals(DELETE) && path.matches(REQUEST_WITH_ADDENDUM)) {
                 controller.removeById(id, resp);
                 return;
             }
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        }catch (NotFoundException notFoundException){
+        } catch (NotFoundException notFoundException) {
             notFoundException.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
